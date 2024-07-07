@@ -1,8 +1,8 @@
+import React, { useState, useEffect } from "react";
 import Header from "./Header.js";
 import "./App.css";
 import "./Header.css";
 import supabase from "./supabaseClient.js";
-import { useState, useEffect } from "react";
 
 function AddYourProduct() {
   const [product, setProduct] = useState([]);
@@ -11,8 +11,6 @@ function AddYourProduct() {
   const [status, setStatus] = useState("");
   const [price, setPrice] = useState("");
   const [url, setUrl] = useState("");
-  const [inputValue, setInputValue] = useState("");
-  const [error, setError] = useState("");
 
   // Fetching data
   useEffect(() => {
@@ -63,7 +61,6 @@ function AddYourProduct() {
     const value = event.target.value;
     const numericValue = value.replace(/[^0-9]/g, "");
     setPrice(numericValue);
-    setInputValue(numericValue);
   };
 
   // Handle image file change
@@ -73,20 +70,22 @@ function AddYourProduct() {
       const reader = new FileReader();
       reader.onloadend = () => {
         setUrl(reader.result);
-        setError("");
       };
       reader.readAsDataURL(file);
     } else {
       setUrl("");
-      setError("Please upload a valid picture file");
+      console.error("Please upload a valid picture file");
     }
   };
 
   // Delete product
   const deleteProduct = async (id) => {
     const { error } = await supabase.from("SupabaseEcom").delete().eq("id", id);
-    if (error) console.log(error);
-    setProduct(product.filter((products) => products.id !== id));
+    if (error) {
+      console.error(error);
+    } else {
+      setProduct(product.filter((products) => products.id !== id));
+    }
   };
 
   return (
