@@ -14,23 +14,7 @@ function AddYourProduct() {
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState("");
 
-  const handleChange = (event) => {
-    const value = event.target.value;
-    const numericValue = value.replace(/[^0-9]/g, "");
-    setInputValue(numericValue);
-    if (!numericValue) {
-      console.log("number only!");
-    }
-  };
-
-  const handlePriceChange = (event) => {
-    const value = event.target.value;
-    const numericValue = value.replace(/[^0-9]/g, "");
-    setPrice(numericValue);
-    setInputValue(numericValue);
-  };
-
-  // fetching data
+  // Fetching data
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -44,16 +28,14 @@ function AddYourProduct() {
     console.log("fetched products", data);
   };
 
-  // adding new data
+  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted");
     if (!title || !description || !status || !price || !url) {
       console.log("All fields are required");
       return;
     }
 
-    console.log("All fields");
     const { data, error } = await supabase.from("SupabaseEcom").insert([
       {
         Title: title,
@@ -66,7 +48,7 @@ function AddYourProduct() {
     if (error) {
       console.log("Error inserting product", error);
     } else {
-      console.log("product added successfully", data);
+      console.log("Product added successfully", data);
       fetchProducts();
       setTitle("");
       setDescription("");
@@ -76,14 +58,15 @@ function AddYourProduct() {
     }
   };
 
-  // deleting data
-  const deleteProduct = async (id) => {
-    const { error } = await supabase.from("SupabaseEcom").delete().eq("id", id);
-    if (error) console.log(error);
-    setProduct(product.filter((products) => products.id !== id));
+  // Handle price input change
+  const handlePriceChange = (event) => {
+    const value = event.target.value;
+    const numericValue = value.replace(/[^0-9]/g, "");
+    setPrice(numericValue);
+    setInputValue(numericValue);
   };
 
-  // Image URL
+  // Handle image file change
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file && file.type.match("image.*")) {
@@ -99,26 +82,11 @@ function AddYourProduct() {
     }
   };
 
-  // URL only code.
-  const handleUrlChange = (event) => {
-    const value = event.target.value;
-    const urlPattern = new RegExp(
-      "^(https?:\\/\\/)?" + // protocol
-        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name and extension
-        "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
-        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-        "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
-        "(\\#[-a-z\\d_]*)?$",
-      "i"
-    ); // fragment locator
-
-    if (urlPattern.test(value)) {
-      setUrl(value);
-      setError("");
-    } else {
-      setUrl("");
-      setError("Please enter a valid url");
-    }
+  // Delete product
+  const deleteProduct = async (id) => {
+    const { error } = await supabase.from("SupabaseEcom").delete().eq("id", id);
+    if (error) console.log(error);
+    setProduct(product.filter((products) => products.id !== id));
   };
 
   return (
@@ -148,7 +116,6 @@ function AddYourProduct() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
-              <br />
             </div>
           </div>
 
@@ -173,7 +140,6 @@ function AddYourProduct() {
                 className="inputName"
                 value={price}
                 onChange={handlePriceChange}
-                keyboardtype="numeric"
                 placeholder="Enter Numbers only"
                 required
               />
